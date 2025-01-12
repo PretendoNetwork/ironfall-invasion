@@ -1,18 +1,18 @@
 package nex
 
 import (
+	"github.com/PretendoNetwork/ironfall-invasion/globals"
+	"github.com/PretendoNetwork/nex-go/v2/types"
+
 	commonmatchmaking "github.com/PretendoNetwork/nex-protocols-common-go/v2/match-making"
 	commonmatchmakingext "github.com/PretendoNetwork/nex-protocols-common-go/v2/match-making-ext"
-	commonmatchmakeextension "github.com/PretendoNetwork/nex-protocols-common-go/v2/matchmake-extension"
+	commonnattraversal "github.com/PretendoNetwork/nex-protocols-common-go/v2/nat-traversal"
+	commonsecure "github.com/PretendoNetwork/nex-protocols-common-go/v2/secure-connection"
 	matchmaking "github.com/PretendoNetwork/nex-protocols-go/v2/match-making"
 	matchmakingext "github.com/PretendoNetwork/nex-protocols-go/v2/match-making-ext"
 	matchmakeextension "github.com/PretendoNetwork/nex-protocols-go/v2/matchmake-extension"
-	"github.com/PretendoNetwork/nex-go/v2/types"
-	commonnattraversal "github.com/PretendoNetwork/nex-protocols-common-go/v2/nat-traversal"
-	commonsecure "github.com/PretendoNetwork/nex-protocols-common-go/v2/secure-connection"
 	nattraversal "github.com/PretendoNetwork/nex-protocols-go/v2/nat-traversal"
 	secure "github.com/PretendoNetwork/nex-protocols-go/v2/secure-connection"
-	"github.com/PretendoNetwork/ironfall-invasion/globals"
 )
 
 func CreateReportDBRecord(_ *types.PID, _ *types.PrimitiveU32, _ *types.QBuffer) error {
@@ -20,12 +20,12 @@ func CreateReportDBRecord(_ *types.PID, _ *types.PrimitiveU32, _ *types.QBuffer)
 }
 
 // probably not required but im referencing minecraft so might as well include this
-func cleanupSearchMatchmakeSessionHandler(matchmakeSession *matchmakingtypes.MatchmakeSession) {
-	//_ = matchmakeSession.Attributes.SetIndex(2, types.NewPrimitiveU32(0))
-	matchmakeSession.MatchmakeParam = matchmakingtypes.NewMatchmakeParam()
-	matchmakeSession.ApplicationBuffer = types.NewBuffer(make([]byte, 0))
-	globals.Logger.Info(matchmakeSession.String())
-}
+// func cleanupSearchMatchmakeSessionHandler(matchmakeSession *matchmakingtypes.MatchmakeSession) {
+// 	//_ = matchmakeSession.Attributes.SetIndex(2, types.NewPrimitiveU32(0))
+// 	matchmakeSession.MatchmakeParam = matchmakingtypes.NewMatchmakeParam()
+// 	matchmakeSession.ApplicationBuffer = types.NewBuffer(make([]byte, 0))
+// 	globals.Logger.Info(matchmakeSession.String())
+// }
 
 func registerCommonSecureServerProtocols() {
 	secureProtocol := secure.NewProtocol()
@@ -38,7 +38,6 @@ func registerCommonSecureServerProtocols() {
 	globals.SecureEndpoint.RegisterServiceProtocol(natTraversalProtocol)
 	commonnattraversal.NewCommonProtocol(natTraversalProtocol)
 
-
 	matchMakingProtocol := matchmaking.NewProtocol()
 	globals.SecureEndpoint.RegisterServiceProtocol(matchMakingProtocol)
 	commonmatchmaking.NewCommonProtocol(matchMakingProtocol)
@@ -48,5 +47,5 @@ func registerCommonSecureServerProtocols() {
 	commonmatchmakingext.NewCommonProtocol(matchMakingExtProtocol)
 	matchmakeExtensionProtocol := matchmakeextension.NewProtocol()
 	globals.SecureEndpoint.RegisterServiceProtocol(matchmakeExtensionProtocol)
-	commonMatchmakeExtensionProtocol := commonmatchmakeextension.NewCommonProtocol(matchmakeExtensionProtocol)
+	//commonMatchmakeExtensionProtocol := commonmatchmakeextension.NewCommonProtocol(matchmakeExtensionProtocol)
 }
