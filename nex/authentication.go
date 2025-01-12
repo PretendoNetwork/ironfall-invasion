@@ -22,7 +22,7 @@ func StartAuthenticationServer() {
 	globals.AuthenticationServer.LibraryVersions.SetDefault(nex.NewLibraryVersion(3, 7, 1))
 	globals.AuthenticationServer.AccessKey = "feb81c7c"
 
-	globals.AuthenticationServer.OnData(func(packet nex.PacketInterface) {
+	globals.AuthenticationEndpoint.OnData(func(packet nex.PacketInterface) {
 		request := packet.RMCMessage()
 
 		fmt.Println("== IRONFALL Invasion - Auth ==")
@@ -38,6 +38,6 @@ func StartAuthenticationServer() {
 	registerCommonAuthenticationServerProtocols()
 
 	port, _ := strconv.Atoi(os.Getenv("PN_MINECRAFT_AUTHENTICATION_SERVER_PORT"))
-	
+
 	globals.AuthenticationServer.Listen(port)
 }
