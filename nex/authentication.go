@@ -3,31 +3,41 @@ package nex
 import (
 	"fmt"
 	"os"
+	"strconv"
 
-	nex "github.com/PretendoNetwork/nex-go"
 	"github.com/PretendoNetwork/ironfall-invasion/globals"
+	"github.com/PretendoNetwork/nex-go/v2"
 )
 
-var serverBuildString string
-
 func StartAuthenticationServer() {
-	globals.AuthenticationServer = nex.NewServer()
-	globals.AuthenticationServer.SetPRUDPVersion(1)
-	globals.AuthenticationServer.SetPRUDPProtocolMinorVersion(4)
-	globals.AuthenticationServer.SetDefaultNEXVersion(nex.NewNEXVersion(3, 7, 1))
-	globals.AuthenticationServer.SetKerberosPassword(globals.KerberosPassword)
-	globals.AuthenticationServer.SetAccessKey("feb81c7c")
+	globals.AuthenticationServer = nex.NewPRUDPServer()
+	globals.AuthenticationServer.ByteStreamSettings.UseStructureHeader = true
 
-	globals.AuthenticationServer.On("Data", func(packet *nex.PacketV1) {
-		request := packet.RMCRequest()
+	globals.AuthenticationEndpoint = nex.NewPRUDPEndPoint(1)
+	globals.AuthenticationEndpoint.ServerAccount = globals.AuthenticationServerAccount
+	globals.AuthenticationEndpoint.AccountDetailsByPID = globals.AccountDetailsByPID
+	globals.AuthenticationEndpoint.AccountDetailsByUsername = globals.AccountDetailsByUsername
+	globals.AuthenticationServer.BindPRUDPEndPoint(globals.AuthenticationEndpoint)
+
+	globals.AuthenticationServer.LibraryVersions.SetDefault(nex.NewLibraryVersion(3, 7, 1))
+	globals.AuthenticationServer.AccessKey = "feb81c7c"
+
+	globals.AuthenticationServer.OnData(func(packet nex.PacketInterface) {
+		request := packet.RMCMessage()
 
 		fmt.Println("== IRONFALL Invasion - Auth ==")
-		fmt.Printf("Protocol ID: %#v\n", request.ProtocolID())
-		fmt.Printf("Method ID: %#v\n", request.MethodID())
+		fmt.Printf("Protocol ID: %#v\n", request.ProtocolID)
+		fmt.Printf("Method ID: %#v\n", request.MethodID)
 		fmt.Println("==============================")
+	})
+
+	globals.AuthenticationEndpoint.OnError(func(err *nex.Error) {
+		globals.Logger.Errorf("Auth: %v", err)
 	})
 
 	registerCommonAuthenticationServerProtocols()
 
-	globals.AuthenticationServer.Listen(fmt.Sprintf(":%s", os.Getenv("PN_IRONFALL_AUTHENTICATION_SERVER_PORT")))
+	port, _ := strconv.Atoi(os.Getenv("PN_MINECRAFT_AUTHENTICATION_SERVER_PORT"))
+	
+	globals.AuthenticationServer.Listen(port)
 }
